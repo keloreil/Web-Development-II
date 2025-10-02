@@ -10,11 +10,9 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// 静态资源
 app.use(express.static(__dirname));
 
-// ================= API 路由 ==================
-// 获取所有活动
+// ================= API  ==================
 app.get('/api/events', (req, res) => {
   const sql = `
     SELECT 
@@ -40,7 +38,7 @@ app.get('/api/events', (req, res) => {
   });
 });
 
-// 启动服务
+// Start the service
 app.listen(PORT, () => {
-  console.log(`✅ API 已启动: http://localhost:${PORT}`);
+  console.log(`✅ API : http://localhost:${PORT}`);
 });

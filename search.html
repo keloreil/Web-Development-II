@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Charity Events - 搜索活动</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Charity Events - Search</title>
   <style>
     body {
       font-family: "Segoe UI", Arial, sans-serif;
@@ -13,7 +12,6 @@
       color: #333;
     }
 
-    /* 顶部横幅 */
     .banner {
       background: linear-gradient(90deg, #f04e30, #f36f56);
       color: white;
@@ -24,7 +22,6 @@
       letter-spacing: 1px;
     }
 
-    /* 导航条 */
     nav {
       background: #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -43,14 +40,12 @@
       color: #c13c23;
     }
 
-    /* 页面标题 */
     h1 {
       margin: 25px 20px 15px;
       font-size: 28px;
       color: #222;
     }
 
-    /* 搜索表单 */
     .search-box {
       background: #fff;
       margin: 0 20px 20px;
@@ -87,7 +82,6 @@
       background: #c13c23;
     }
 
-    /* 活动列表容器 */
     #search-results {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -95,7 +89,6 @@
       padding: 20px;
     }
 
-    /* 活动卡片 */
     .event-item {
       background: white;
       border-radius: 10px;
@@ -117,48 +110,57 @@
       font-size: 14px;
       line-height: 1.5;
     }
+    .progress-bar {
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progress-bar-inner {
+      background: #f36f56;
+      height: 10px;
+      width: 0%;
+      transition: width 0.6s;
+    }
   </style>
 </head>
 <body>
-  <!-- 顶部横幅 -->
-  <div class="banner">欢迎参加城市慈善</div>
+  <div class="banner">Welcome to City Charity</div>
 
-  <!-- 导航栏 -->
   <nav>
-    <a href="index.html">首页</a>
-    <a href="search.html">搜索活动</a>
+    <a href="index.html">Home</a>
+    <a href="search.html">Search Events</a>
   </nav>
 
-  <!-- 页面标题 -->
-  <h1>搜索活动</h1>
+  <h1>Search Events</h1>
 
-  <!-- 搜索表单 -->
   <form class="search-box" id="search-form">
     <div>
-      <label for="date">日期:</label>
+      <label for="date">Date:</label>
       <input type="date" id="date" name="date">
     </div>
     <div>
-      <label for="location">地点:</label>
-      <input type="text" id="location" name="location" placeholder="输入城市或场馆">
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" placeholder="City or Venue">
     </div>
     <div>
-      <label for="category">类别:</label>
+      <label for="category">Category:</label>
       <select id="category" name="category">
-        <option value="">全部</option>
+        <option value="">All</option>
         <option value="Charity Dinner">Charity Dinner</option>
-        <option value="Concert">Concert</option>
         <option value="Fun Run">Fun Run</option>
+        <option value="Silent Auction">Silent Auction</option>
+        <option value="Community Event">Community Event</option>
+        <option value="Concert">Concert</option>
       </select>
     </div>
     <div>
-      <button type="submit">搜索</button>
-      <button type="button" id="reset-btn">清空</button>
+      <button type="submit">Search</button>
+      <button type="button" id="reset-btn">Reset</button>
     </div>
   </form>
 
-  <!-- 搜索结果 -->
-  <div id="search-results">请使用上方表单进行搜索。</div>
+  <div id="search-results">Use the form above to search events.</div>
 
   <script>
     document.getElementById('search-form').addEventListener('submit', async (e) => {
@@ -183,32 +185,44 @@
         container.innerHTML = "";
 
         if (filtered.length === 0) {
-          container.textContent = "没有找到符合条件的活动。";
+          container.textContent = "No events found.";
           return;
         }
 
         filtered.forEach(ev => {
           const div = document.createElement('div');
           div.classList.add('event-item');
+
+          let percent = 0;
+          if (ev.goal_amount && ev.goal_amount > 0) {
+            percent = Math.min((ev.current_amount / ev.goal_amount) * 100, 100);
+          }
+
           div.innerHTML = `
             <h3>${ev.event_name}</h3>
-            <p><strong>时间：</strong>${new Date(ev.event_datetime).toLocaleString()}</p>
-            <p><strong>地点：</strong>${ev.location}</p>
-            <p><strong>票价：</strong>$${ev.ticket_price}</p>
-            <p><strong>分类：</strong>${ev.category_name}</p>
-            <p><strong>主办方：</strong>${ev.organization_name}</p>
+            <p><strong>Time:</strong> ${new Date(ev.event_datetime).toLocaleString()}</p>
+            <p><strong>Location:</strong> ${ev.location}</p>
+            <p><strong>Ticket Price:</strong> $${ev.ticket_price}</p>
+            <p><strong>Category:</strong> ${ev.category_name}</p>
+            <p><strong>Organizer:</strong> ${ev.organization_name}</p>
+            <p><strong>Goal Amount:</strong> $${ev.goal_amount}</p>
+            <p><strong>Amount Raised:</strong> $${ev.current_amount}</p>
+            <div class="progress-bar">
+              <div class="progress-bar-inner" style="width:${percent}%"></div>
+            </div>
+            <p><strong>Contact:</strong> ${ev.contact_details || "N/A"}</p>
           `;
           container.appendChild(div);
         });
       } catch (err) {
-        console.error("搜索失败:", err);
-        document.getElementById('search-results').textContent = "搜索失败，请检查控制台。";
+        console.error("Search failed:", err);
+        document.getElementById('search-results').textContent = "Search failed. Check console.";
       }
     });
 
     document.getElementById('reset-btn').addEventListener('click', () => {
       document.getElementById('search-form').reset();
-      document.getElementById('search-results').textContent = "请使用上方表单进行搜索。";
+      document.getElementById('search-results').textContent = "Use the form above to search events.";
     });
   </script>
 </body>
