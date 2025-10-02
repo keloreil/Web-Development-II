@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>搜索活动</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html">首页</a> |
+    <a href="search.html">搜索活动</a>
+  </nav>
+  <h1>搜索活动</h1>
+
+  <form id="search-form">
+    <label>日期: <input type="date" id="date"></label>
+    <label>地点: <input type="text" id="location"></label>
+    <label>类别:
+      <select id="category">
+        <option value="">全部</option>
+      </select>
+    </label>
+    <button type="submit">搜索</button>
+    <button type="reset">清空</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script src="js/search.js"></script>
+</body>
+</html>

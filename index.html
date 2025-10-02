@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Charity Events - 首页</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    /* 顶部横幅 */
+    .banner {
+      background: linear-gradient(90deg, #f04e30, #f36f56);
+      color: white;
+      text-align: center;
+      padding: 18px 0;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* 导航条 */
+    nav {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 12px 20px;
+      display: flex;
+      gap: 15px;
+      font-size: 16px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #f04e30;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #c13c23;
+    }
+
+    /* 页面标题 */
+    h1 {
+      margin: 25px 20px 15px;
+      font-size: 28px;
+      color: #222;
+    }
+
+    /* 活动列表容器 */
+    #event-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    /* 活动卡片 */
+    .event-item {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .event-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .event-item h3 {
+      margin: 0 0 12px;
+      color: #f04e30;
+      font-size: 20px;
+    }
+    .event-item p {
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .event-item p strong {
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部横幅 -->
+  <div class="banner">欢迎参加城市慈善</div>
+
+  <!-- 导航栏 -->
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="search.html">搜索活动</a>
+  </nav>
+
+  <!-- 页面标题 -->
+  <h1>Charity Events</h1>
+
+  <!-- 活动列表 -->
+  <div id="event-list">加载中...</div>
+
+  <script>
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events');
+        const events = await res.json();
+
+        const container = document.getElementById('event-list');
+        container.innerHTML = ""; // 清空“加载中...”
+
+        events.forEach(ev => {
+          const div = document.createElement('div');
+          div.classList.add('event-item');
+          div.innerHTML = `
+            <h3>${ev.event_name}</h3>
+            <p><strong>时间：</strong>${new Date(ev.event_datetime).toLocaleString()}</p>
+            <p><strong>地点：</strong>${ev.location}</p>
+            <p><strong>票价：</strong>$${ev.ticket_price}</p>
+            <p><strong>分类：</strong>${ev.category_name}</p>
+            <p><strong>主办方：</strong>${ev.organization_name}</p>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("❌ 活动加载失败:", err);
+        document.getElementById('event-list').textContent = "加载失败，请检查控制台。";
+      }
+    }
+
+    loadEvents();
+  </script>
+</body>
+</html>
