@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Charity Events - 首页</title>
-  <link rel="stylesheet" href="css/style.css">
   <style>
     body {
       font-family: "Segoe UI", Arial, sans-serif;
@@ -12,8 +11,6 @@
       background: #f5f7fa;
       color: #333;
     }
-
-    /* 顶部横幅 */
     .banner {
       background: linear-gradient(90deg, #f04e30, #f36f56);
       color: white;
@@ -23,8 +20,6 @@
       font-weight: bold;
       letter-spacing: 1px;
     }
-
-    /* 导航条 */
     nav {
       background: #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -42,23 +37,17 @@
     nav a:hover {
       color: #c13c23;
     }
-
-    /* 页面标题 */
     h1 {
       margin: 25px 20px 15px;
       font-size: 28px;
       color: #222;
     }
-
-    /* 活动列表容器 */
     #event-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       padding: 20px;
     }
-
-    /* 活动卡片 */
     .event-item {
       background: white;
       border-radius: 10px;
@@ -80,25 +69,30 @@
       font-size: 14px;
       line-height: 1.5;
     }
-    .event-item p strong {
-      color: #444;
+    .progress-bar {
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progress-bar-inner {
+      background: #f36f56;
+      height: 10px;
+      width: 0%;
+      transition: width 0.6s;
     }
   </style>
 </head>
 <body>
-  <!-- 顶部横幅 -->
   <div class="banner">欢迎参加城市慈善</div>
 
-  <!-- 导航栏 -->
   <nav>
     <a href="index.html">首页</a>
     <a href="search.html">搜索活动</a>
   </nav>
 
-  <!-- 页面标题 -->
   <h1>Charity Events</h1>
 
-  <!-- 活动列表 -->
   <div id="event-list">加载中...</div>
 
   <script>
@@ -108,11 +102,18 @@
         const events = await res.json();
 
         const container = document.getElementById('event-list');
-        container.innerHTML = ""; // 清空“加载中...”
+        container.innerHTML = "";
 
         events.forEach(ev => {
           const div = document.createElement('div');
           div.classList.add('event-item');
+
+          // 计算进度条百分比
+          let percent = 0;
+          if (ev.goal_amount && ev.goal_amount > 0) {
+            percent = Math.min((ev.current_amount / ev.goal_amount) * 100, 100);
+          }
+
           div.innerHTML = `
             <h3>${ev.event_name}</h3>
             <p><strong>时间：</strong>${new Date(ev.event_datetime).toLocaleString()}</p>
@@ -120,6 +121,12 @@
             <p><strong>票价：</strong>$${ev.ticket_price}</p>
             <p><strong>分类：</strong>${ev.category_name}</p>
             <p><strong>主办方：</strong>${ev.organization_name}</p>
+            <p><strong>筹款目标：</strong>$${ev.goal_amount}</p>
+            <p><strong>已筹金额：</strong>$${ev.current_amount}</p>
+            <div class="progress-bar">
+              <div class="progress-bar-inner" style="width:${percent}%"></div>
+            </div>
+            <p><strong>联系方式：</strong>${ev.contact_details || "暂无"}</p>
           `;
           container.appendChild(div);
         });

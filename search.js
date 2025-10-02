@@ -1,4 +1,3 @@
-// 加载类别到下拉框
 fetch('http://localhost:3000/api/categories')
   .then(res => res.json())
   .then(categories => {

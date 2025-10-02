@@ -2,30 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>搜索活动</title>
+  <title>Charity Events - 搜索活动</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    /* 顶部横幅 */
+    .banner {
+      background: linear-gradient(90deg, #f04e30, #f36f56);
+      color: white;
+      text-align: center;
+      padding: 18px 0;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* 导航条 */
+    nav {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 12px 20px;
+      display: flex;
+      gap: 15px;
+      font-size: 16px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #f04e30;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #c13c23;
+    }
+
+    /* 页面标题 */
+    h1 {
+      margin: 25px 20px 15px;
+      font-size: 28px;
+      color: #222;
+    }
+
+    /* 搜索表单 */
+    .search-box {
+      background: #fff;
+      margin: 0 20px 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    .search-box label {
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .search-box input,
+    .search-box select {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .search-box button {
+      background: #f04e30;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .search-box button:hover {
+      background: #c13c23;
+    }
+
+    /* 活动列表容器 */
+    #search-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    /* 活动卡片 */
+    .event-item {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .event-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .event-item h3 {
+      margin: 0 0 12px;
+      color: #f04e30;
+      font-size: 20px;
+    }
+    .event-item p {
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 <body>
+  <!-- 顶部横幅 -->
+  <div class="banner">欢迎参加城市慈善</div>
+
+  <!-- 导航栏 -->
   <nav>
-    <a href="index.html">首页</a> |
+    <a href="index.html">首页</a>
     <a href="search.html">搜索活动</a>
   </nav>
+
+  <!-- 页面标题 -->
   <h1>搜索活动</h1>
 
-  <form id="search-form">
-    <label>日期: <input type="date" id="date"></label>
-    <label>地点: <input type="text" id="location"></label>
-    <label>类别:
-      <select id="category">
+  <!-- 搜索表单 -->
+  <form class="search-box" id="search-form">
+    <div>
+      <label for="date">日期:</label>
+      <input type="date" id="date" name="date">
+    </div>
+    <div>
+      <label for="location">地点:</label>
+      <input type="text" id="location" name="location" placeholder="输入城市或场馆">
+    </div>
+    <div>
+      <label for="category">类别:</label>
+      <select id="category" name="category">
         <option value="">全部</option>
+        <option value="Charity Dinner">Charity Dinner</option>
+        <option value="Concert">Concert</option>
+        <option value="Fun Run">Fun Run</option>
       </select>
-    </label>
-    <button type="submit">搜索</button>
-    <button type="reset">清空</button>
+    </div>
+    <div>
+      <button type="submit">搜索</button>
+      <button type="button" id="reset-btn">清空</button>
+    </div>
   </form>
 
-  <div id="results"></div>
+  <!-- 搜索结果 -->
+  <div id="search-results">请使用上方表单进行搜索。</div>
 
-  <script src="js/search.js"></script>
+  <script>
+    document.getElementById('search-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = document.getElementById('date').value;
+      const location = document.getElementById('location').value.trim();
+      const category = document.getElementById('category').value;
+
+      try {
+        const res = await fetch('/api/events');
+        const events = await res.json();
+
+        const filtered = events.filter(ev => {
+          let match = true;
+          if (date && !ev.event_datetime.startsWith(date)) match = false;
+          if (location && !ev.location.includes(location)) match = false;
+          if (category && ev.category_name !== category) match = false;
+          return match;
+        });
+
+        const container = document.getElementById('search-results');
+        container.innerHTML = "";
+
+        if (filtered.length === 0) {
+          container.textContent = "没有找到符合条件的活动。";
+          return;
+        }
+
+        filtered.forEach(ev => {
+          const div = document.createElement('div');
+          div.classList.add('event-item');
+          div.innerHTML = `
+            <h3>${ev.event_name}</h3>
+            <p><strong>时间：</strong>${new Date(ev.event_datetime).toLocaleString()}</p>
+            <p><strong>地点：</strong>${ev.location}</p>
+            <p><strong>票价：</strong>$${ev.ticket_price}</p>
+            <p><strong>分类：</strong>${ev.category_name}</p>
+            <p><strong>主办方：</strong>${ev.organization_name}</p>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("搜索失败:", err);
+        document.getElementById('search-results').textContent = "搜索失败，请检查控制台。";
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      document.getElementById('search-form').reset();
+      document.getElementById('search-results').textContent = "请使用上方表单进行搜索。";
+    });
+  </script>
 </body>
 </html>
