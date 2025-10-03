@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('./event_db'); // 你自己的数据库连接配置
+const db = require('./event_db'); 
 
 const app = express();
 const PORT = 3000;
@@ -10,12 +10,12 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// 静态文件服务 (前端 html/js/css)
+// Static file service ( html/js/css)
 app.use(express.static(__dirname));
 
 // ================= API ==================
 
-// 获取所有活动
+// Get all activities
 app.get('/api/events', (req, res) => {
   const sql = `
     SELECT 
@@ -39,7 +39,7 @@ app.get('/api/events', (req, res) => {
   });
 });
 
-// 获取单个活动详情
+// Get individual activity details
 app.get('/api/events/:id', (req, res) => {
   const eventId = req.params.id;
   const sql = `
@@ -66,7 +66,7 @@ app.get('/api/events/:id', (req, res) => {
   });
 });
 
-// 获取所有类别
+//Get all categories
 app.get('/api/categories', (req, res) => {
   const sql = `SELECT category_id AS id, category_name FROM categories`;
   db.query(sql, (err, results) => {
@@ -75,7 +75,7 @@ app.get('/api/categories', (req, res) => {
   });
 });
 
-// 获取所有组织
+// Get all organizations
 app.get('/api/organizations', (req, res) => {
   const sql = `SELECT organization_id AS id, organization_name, contact_details FROM organizations`;
   db.query(sql, (err, results) => {
@@ -86,5 +86,5 @@ app.get('/api/organizations', (req, res) => {
 
 // ================= Start Server =================
 app.listen(PORT, () => {
-  console.log(`✅ API is running at: http://localhost:${PORT}`);
+  console.log(` API is running at: http://localhost:${PORT}`);
 });

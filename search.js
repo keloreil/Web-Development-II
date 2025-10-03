@@ -59,26 +59,27 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
       const eventDate = new Date(ev.event_datetime);
       const status = getEventStatus(eventDate);
 
-      div.innerHTML = `
-        <h3>${ev.event_name}</h3>
-        <p><strong>Time:</strong> ${eventDate.toLocaleString()}</p>
-        <p><strong>Location:</strong> ${ev.location}</p>
-        <p><strong>Ticket Price:</strong> $${ev.ticket_price}</p>
-        <p><strong>Category:</strong> ${ev.category_name}</p>
-        <p><strong>Organizer:</strong> ${ev.organization_name}</p>
-        <p><strong>Goal Amount:</strong> $${ev.goal_amount}</p>
-        <p><strong>Amount Raised:</strong> $${ev.current_amount}</p>
-        <div class="progress-bar">
-          <div class="progress-bar-inner" style="width:${percent}%"></div>
-        </div>
-        <p><strong>Contact:</strong> ${ev.contact_details || "N/A"}</p>
-        <p class="status ${status === "Past" ? "past" : "upcoming"}">Status: ${status}</p>
+div.innerHTML = `
+  <h3>${ev.event_name}</h3>
+  <p><strong>Time:</strong> ${eventDate.toLocaleString()}</p>
+  <p><strong>Location:</strong> ${ev.location}</p>
+  <p><strong>Ticket Price:</strong> $${ev.ticket_price}</p>
+  <p><strong>Category:</strong> ${ev.category_name}</p>
+  <p><strong>Organizer:</strong> ${ev.organization_name}</p>
+  <p><strong>Goal Amount:</strong> $${ev.goal_amount}</p>
+  <p><strong>Amount Raised:</strong> $${ev.current_amount}</p>
+  <div class="progress-bar">
+    <div class="progress-bar-inner" style="width:${percent}%"></div>
+  </div>
+  <p><strong>Contact:</strong> ${ev.contact_details || "N/A"}</p>
+  <p class="status ${status === "Past" ? "past" : "upcoming"}">Status: ${status}</p>
 
-        <div class="card-footer" style="margin-top:10px;">
-          <a class="btn details" href="event.html?id=${ev.event_id}">View Details</a>
-          <a class="btn register" href="event.html?id=${ev.event_id}#register" onclick="event.preventDefault(); alert('This feature is currently under construction.')">Register</a>
-        </div>
-      `;
+  <div class="card-footer" style="margin-top:10px;">
+    <a class="btn details" href="event.html?id=${ev.event_id || ev.id}">View Details</a>
+    <a class="btn register" href="event.html?id=${ev.event_id || ev.id}#register" onclick="event.preventDefault(); alert('This feature is currently under construction.')">Register</a>
+  </div>
+`;
+
 
       container.appendChild(div);
     });
