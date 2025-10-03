@@ -3,18 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <title>Event Details</title>
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    nav {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 12px 20px;
+      font-size: 16px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #f04e30;
+      font-weight: 600;
+      margin-right: 12px;
+    }
+    nav a:hover {
+      color: #c13c23;
+    }
+    h1 {
+      margin: 25px 20px 10px;
+      font-size: 28px;
+      color: #222;
+    }
+    #event-description {
+      margin: 0 20px 20px;
+      font-size: 16px;
+      color: #555;
+    }
+    #event-info {
+      margin: 0 20px 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    #event-info p {
+      margin: 6px 0;
+    }
+    #register-btn {
+      margin: 0 20px 40px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #f04e30;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #register-btn:hover {
+      background: #c13c23;
+    }
+  </style>
 </head>
 <body>
   <nav>
-    <a href="index.html">Home</a> |
+    <a href="index.html">Home</a>
     <a href="search.html">Search Events</a>
   </nav>
+
   <h1 id="event-title">Loading...</h1>
   <p id="event-description"></p>
   <div id="event-info"></div>
-  <button id="register-btn">registration</button>
+  <button id="register-btn">Register</button>
 
-  <script src="js/event.js"></script>
+  <script src="event.js"></script>
 </body>
 </html>

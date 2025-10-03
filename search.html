@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Charity Events - Search</title>
+  <link rel="stylesheet" href="css/style.css">
   <style>
     body {
       font-family: "Segoe UI", Arial, sans-serif;
@@ -110,6 +111,16 @@
       font-size: 14px;
       line-height: 1.5;
     }
+    .status {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+    .status.past {
+      color: #777;
+    }
+    .status.upcoming {
+      color: #28a745;
+    }
     .progress-bar {
       background: #eee;
       border-radius: 5px;
@@ -122,6 +133,42 @@
       width: 0%;
       transition: width 0.6s;
     }
+    .details-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #f04e30;
+      color: white;
+      border-radius: 6px;
+      font-size: 14px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .details-link:hover {
+      background: #c13c23;
+    }
+    .btn {
+  display: inline-block;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn.details {
+  background: #1976d2;
+  color: #fff;
+}
+.btn.details:hover { background: #135faa; }
+
+.btn.register {
+  background: #f04e30;
+  color: #fff;
+}
+.btn.register:hover { background: #c13c23; }
+
   </style>
 </head>
 <body>
@@ -147,11 +194,6 @@
       <label for="category">Category:</label>
       <select id="category" name="category">
         <option value="">All</option>
-        <option value="Charity Dinner">Charity Dinner</option>
-        <option value="Fun Run">Fun Run</option>
-        <option value="Silent Auction">Silent Auction</option>
-        <option value="Community Event">Community Event</option>
-        <option value="Concert">Concert</option>
       </select>
     </div>
     <div>
@@ -162,68 +204,6 @@
 
   <div id="search-results">Use the form above to search events.</div>
 
-  <script>
-    document.getElementById('search-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const date = document.getElementById('date').value;
-      const location = document.getElementById('location').value.trim();
-      const category = document.getElementById('category').value;
-
-      try {
-        const res = await fetch('/api/events');
-        const events = await res.json();
-
-        const filtered = events.filter(ev => {
-          let match = true;
-          if (date && !ev.event_datetime.startsWith(date)) match = false;
-          if (location && !ev.location.includes(location)) match = false;
-          if (category && ev.category_name !== category) match = false;
-          return match;
-        });
-
-        const container = document.getElementById('search-results');
-        container.innerHTML = "";
-
-        if (filtered.length === 0) {
-          container.textContent = "No events found.";
-          return;
-        }
-
-        filtered.forEach(ev => {
-          const div = document.createElement('div');
-          div.classList.add('event-item');
-
-          let percent = 0;
-          if (ev.goal_amount && ev.goal_amount > 0) {
-            percent = Math.min((ev.current_amount / ev.goal_amount) * 100, 100);
-          }
-
-          div.innerHTML = `
-            <h3>${ev.event_name}</h3>
-            <p><strong>Time:</strong> ${new Date(ev.event_datetime).toLocaleString()}</p>
-            <p><strong>Location:</strong> ${ev.location}</p>
-            <p><strong>Ticket Price:</strong> $${ev.ticket_price}</p>
-            <p><strong>Category:</strong> ${ev.category_name}</p>
-            <p><strong>Organizer:</strong> ${ev.organization_name}</p>
-            <p><strong>Goal Amount:</strong> $${ev.goal_amount}</p>
-            <p><strong>Amount Raised:</strong> $${ev.current_amount}</p>
-            <div class="progress-bar">
-              <div class="progress-bar-inner" style="width:${percent}%"></div>
-            </div>
-            <p><strong>Contact:</strong> ${ev.contact_details || "N/A"}</p>
-          `;
-          container.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Search failed:", err);
-        document.getElementById('search-results').textContent = "Search failed. Check console.";
-      }
-    });
-
-    document.getElementById('reset-btn').addEventListener('click', () => {
-      document.getElementById('search-form').reset();
-      document.getElementById('search-results').textContent = "Use the form above to search events.";
-    });
-  </script>
+  <script src="search.js"></script>
 </body>
 </html>

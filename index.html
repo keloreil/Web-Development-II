@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Charity Events - Home </title>
+  <meta charset="UTF-8" />
+  <title>Charity Events - Home</title>
   <style>
     body {
       font-family: "Segoe UI", Arial, sans-serif;
@@ -44,7 +44,7 @@
     }
     #event-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
       padding: 20px;
     }
@@ -54,6 +54,9 @@
       padding: 18px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .event-item:hover {
       transform: translateY(-4px);
@@ -64,35 +67,33 @@
       color: #f04e30;
       font-size: 20px;
     }
-    .event-item p {
-      margin: 5px 0;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .progress-bar {
-      background: #eee;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 5px;
-    }
-    .progress-bar-inner {
-      background: #f36f56;
-      height: 10px;
-      width: 0%;
-      transition: width 0.6s;
+    .meta { margin-bottom: 10px; font-size: 14px; color: #444; }
+    .meta p { margin: 4px 0; }
+    .progress-bar { background: #eee; border-radius: 5px; overflow: hidden; margin-top: 8px; }
+    .progress-bar-inner { background: #f36f56; height: 10px; width: 0%; transition: width 0.6s; }
+    .card-footer { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .btn { display: inline-block; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .btn.details { background: #1976d2; color: #fff; }
+    .btn.details:hover { background: #135faa; }
+    .btn.register { background: #f04e30; color: #fff; }
+    .btn.register:hover { background: #c13c23; }
+    .badge { padding: 2px 6px; border-radius: 6px; font-size: 12px; margin-left: 8px; white-space: nowrap; }
+    .past { background: #ffefef; color: #a00; border: 1px solid #f2c6c6; }
+    .upcoming { background: #eefdf2; color: #166a22; border: 1px solid #bfe6c9; }
+
+    @media (max-width: 480px) {
+      #event-list { grid-template-columns: 1fr; padding: 12px; }
+      .event-item { padding: 14px; }
     }
   </style>
 </head>
 <body>
   <div class="banner">Welcome to City Charity</div>
-
   <nav>
     <a href="index.html">Home</a>
     <a href="search.html">Search Events</a>
   </nav>
-
   <h1>Charity Events</h1>
-
   <div id="event-list">Loading...</div>
 
   <script>
@@ -100,40 +101,68 @@
       try {
         const res = await fetch('/api/events');
         const events = await res.json();
-
         const container = document.getElementById('event-list');
         container.innerHTML = "";
+        const today = new Date();
 
         events.forEach(ev => {
+          if (typeof ev.is_active !== 'undefined' && Number(ev.is_active) === 0) return;
+
           const div = document.createElement('div');
           div.classList.add('event-item');
 
-          // Calculate progress bar percentage
-          let percent = 0;
-          if (ev.goal_amount && ev.goal_amount > 0) {
-            percent = Math.min((ev.current_amount / ev.goal_amount) * 100, 100);
-          }
+          const goal = parseFloat(ev.goal_amount) || 0;
+          const current = parseFloat(ev.current_amount) || 0;
+          let percent = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
+
+          const eventDate = ev.event_datetime ? new Date(ev.event_datetime) : null;
+          const statusBadge = eventDate
+            ? (eventDate < today
+                ? `<span class="badge past">Past Event</span>`
+                : `<span class="badge upcoming">Upcoming Event</span>`)
+            : '';
+
+          const fmt = num => Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
           div.innerHTML = `
-            <h3>${ev.event_name}</h3>
-            <p><strong>Time：</strong>${new Date(ev.event_datetime).toLocaleString()}</p>
-            <p><strong>Location：</strong>${ev.location}</p>
-            <p><strong>Ticket price：</strong>$${ev.ticket_price}</p>
-            <p><strong>Category：</strong>${ev.category_name}</p>
-            <p><strong>Organization：</strong>${ev.organization_name}</p>
-            <p><strong>Fundraising Goal：</strong>$${ev.goal_amount}</p>
-            <p><strong>Raised amount：</strong>$${ev.current_amount}</p>
-            <div class="progress-bar">
-              <div class="progress-bar-inner" style="width:${percent}%"></div>
+            <div>
+              <h3>${escapeHtml(ev.event_name || '')}</h3>
+              <div class="meta">
+                <p><strong>Time:</strong> ${ eventDate ? eventDate.toLocaleString() : 'TBD' } ${statusBadge}</p>
+                <p><strong>Location:</strong> ${escapeHtml(ev.location || 'TBD')}</p>
+                <p><strong>Ticket price:</strong> $${fmt(ev.ticket_price || 0)}</p>
+                <p><strong>Category:</strong> ${escapeHtml(ev.category_name || '')}</p>
+                <p><strong>Organization:</strong> ${escapeHtml(ev.organization_name || '')}</p>
+                <p><strong>Fundraising Goal:</strong> $${fmt(goal)}</p>
+                <p><strong>Raised amount:</strong> $${fmt(current)}</p>
+                <div class="progress-bar">
+                  <div class="progress-bar-inner" style="width:${percent}%"></div>
+                </div>
+                <p><strong>Contact Information:</strong> ${escapeHtml(ev.contact_details || 'N/A')}</p>
+              </div>
             </div>
-            <p><strong>Contact Information：</strong>${ev.contact_details || "暂无"}</p>
+
+            <div class="card-footer">
+              <a class="btn details" href="event.html?id=${encodeURIComponent(ev.id)}">View Details</a>
+              <a class="btn register" href="event.html?id=${encodeURIComponent(ev.id)}#register" onclick="return showRegisterNotice(event)">Register</a>
+            </div>
           `;
           container.appendChild(div);
         });
       } catch (err) {
         console.error("❌ Activity loading failed:", err);
-        document.getElementById('event-list').textContent = "Loading failed, please check the console。";
+        document.getElementById('event-list').textContent = "Loading failed, please check the console.";
       }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+    }
+
+    function showRegisterNotice(event) {
+      event.preventDefault();
+      alert("This feature is currently under construction.");
+      return false;
     }
 
     loadEvents();
